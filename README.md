@@ -22,15 +22,31 @@ pip install pywinrm>=0.3.0
 Launch a text editor of your choice and create `azure_vm_deployment.yml`. Inject the content provided below:
 
 ```yaml
+
 ---
-- name: Create Azure VM
+- name: Deploy Azure VM
   hosts: localhost
-  connection: local
   tasks:
-    - name: Create resource group
+    - name: Create a Resource Group
       azure_rm_resourcegroup:
-        name: asarmyResourceGroup
-        location: eastus
+        name: myResourceGroup
+        location: East US
+      register: rg
+
+    - name: Create an Azure VM
+      azure_rm_virtualmachine:
+        resource_group: "{{ rg.name }}"
+        name: myVM
+        vm_size: Standard_DS1_v2
+        admin_username: myadmin
+        admin_password: mypassword
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: 18.04-LTS
+        os_disk_size_gb: 30
+      register: vm
+
 ```
 
 ### 3. Additional Variable Incorporation (Optional)
